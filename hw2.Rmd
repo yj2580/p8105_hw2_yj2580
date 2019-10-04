@@ -54,22 +54,38 @@ pre_df = rbind(pre2017_df, pre2018_df)
 ```
 
 Comments: 
-The total precipitation in 2018 was `r sum(pull(filter(pre_df, year == "2018"),total))`. The median number of sports balls in a dumpster in 2017 was `r median(pull(filter(trash_df, year == "2017"), sports_balls))`.
+In the Mr. Trash Wheel, we can see the summary of variables from this table: 
+```{r, echo = FALSE}
+str(trash_df)
+```
+so there are `r nrow(trash_df)` observations and `r ncol(trash_df)` variables in total.
+The key variables for trash data are dumpter number (dumpster), date of collection(year, month, date), amount of total litter (weight_tons, volume_cubic_yards) and litter types (plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls, homes_powered).
 
+In the precipitation data in 2017 and 2018, we can see the summary of variables from this table: 
+```{r, echo = FALSE}
+str(pre_df)
+```
+so there are `r nrow(pre_df)` observations and `r ncol(pre_df)` variables in total. The key variables includes month, year and the total precipitation amounts.
+
+The total precipitation in 2018 was `r sum(pull(filter(pre_df, year == "2018"),total))`. The median number of sports balls in a dumpster in 2017 was `r median(pull(filter(trash_df, year == "2017"), sports_balls))`.
 
 ## Problem 2
 
 ```{r}
+#create a dataframe
 pols_month_df = read_csv("./data/pols-month.csv") %>%
   janitor::clean_names()  %>%
+  #seperate date into year, month and day
   separate(mon, c("year", "month", "day")) %>%
   mutate(year = as.integer(year),
          month = as.integer(month),
          day = as.integer(day),
+         #replace month number with month name
          month = as.factor(month.name[month]),
+         #create a president variable taking values gop and dem
          president = ifelse(prez_gop == "1", "gop", "dem")) %>%
+  #remove prez_dem and prez_gop, and the day variable
   select(-day, -prez_gop, -prez_dem)
-pols_month_df
 
 snp_df = read_csv("./data/snp.csv") %>%
   janitor::clean_names()  %>%
@@ -78,58 +94,71 @@ snp_df = read_csv("./data/snp.csv") %>%
          month = as.integer(month),
          day = as.integer(day),
          month = month.name[month],
-         month = factor(month, levels = month.name)) %>%
+         #in order to order by month
+         month = factor(month, levels = month.name)) %>% 
   arrange(year, month) %>%
+  #organize so that year and month are the leading columns
   select(year, month, everything())
-snp_df
 
-unemployment_df = read_csv("./data/unemployment.csv") %>%
+unemploy_df = read_csv("./data/unemployment.csv") %>%
   janitor::clean_names()  %>%
   pivot_longer(
     jan:dec,
     names_to = "month", 
     values_to = "unemployment") %>%
+  #change month into full name to keep the same key variable name and the same value
   mutate(month = factor(month, labels = month.name),
          year = as.integer(year))
-unemployment_df
 
 #merge snp into pols
 snp_pols = left_join(pols_month_df, snp_df, by = c("year", "month"))
 snp_pols
 #merge unemployment into the result
-snp_pols_unemploy = left_join(snp_pols, unemployment_df, by = c("year", "month"))
+snp_pols_unemploy = left_join(snp_pols, unemploy_df, by = c("year", "month"))
 snp_pols_unemploy
 ```
+Comment:
+Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
+
 
 ## Problem 3
 
 ```{r}
+#create popular baby name dataframe
 pop_baby_name = read_csv("./data/Popular_Baby_Names.csv") %>%
   janitor::clean_names()  %>%
+  #uppercase child's first name to make data look better
   mutate(childs_first_name = toupper(childs_first_name),
+         # unify ethnicity name
          ethnicity = ifelse(ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER", ethnicity),
          ethnicity = ifelse(ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC", ethnicity),
          ethnicity = ifelse(ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC", ethnicity)) %>%
+  #delete duplicate rows
   distinct()
 
 # the rank in popularity of the name “Olivia” as a female baby name over time
 filter(pop_baby_name, childs_first_name == "OLIVIA") %>%
   select(year_of_birth, ethnicity, rank) %>%
   pivot_wider(
-    names_from = "ethnicity",
+    names_from = "year_of_birth",
     values_from = "rank"
-  )
+  ) %>%
+  knitr::kable()
 
 # the most popular name among male children over time
 filter(pop_baby_name, rank == "1", gender == "MALE") %>%
   select(year_of_birth, ethnicity, childs_first_name ) %>%
   pivot_wider(
-    names_from = "ethnicity",
+    names_from = "year_of_birth",
     values_from = "childs_first_name"
-  )
+  ) %>%
+  knitr::kable()
 
-male_whnohis = filter(pop_baby_name, gender == "MALE", ethnicity =="WHITE NON HISPANIC", year_of_birth == "2016")
-scatterplot = ggplot(male_whnohis, aes(y = count, x = rank)) +geom_point()
+# pull the data of male, white born in 2016
+male_whnohis_16 = filter(pop_baby_name, gender == "MALE", ethnicity =="WHITE NON HISPANIC", year_of_birth == "2016")
+# produce a scatter plot 
+scatterplot = ggplot(male_whnohis_16, aes(y = count, x = rank)) +geom_point() + labs(title = "Number of children with a name against the rank in popularity of that name", x ="rank", y = "number of children")
 scatterplot
+ggsave("scatterplot.pdf")
 ```
 

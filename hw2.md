@@ -46,20 +46,64 @@ pre2017_df = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sh
 pre_df = rbind(pre2017_df, pre2018_df)
 ```
 
-Comments: The total precipitation in 2018 was 23.5. The median number of
-sports balls in a dumpster in 2017 was 8.
+Comments: In the Mr. Trash Wheel, we can see the summary of variables
+from this
+    table:
+
+    ## Classes 'tbl_df', 'tbl' and 'data.frame':    344 obs. of  14 variables:
+    ##  $ dumpster          : num  1 2 3 4 5 6 7 8 9 10 ...
+    ##  $ month             : chr  "May" "May" "May" "May" ...
+    ##  $ year              : num  2014 2014 2014 2014 2014 ...
+    ##  $ date              : POSIXct, format: "2014-05-16" "2014-05-16" ...
+    ##  $ weight_tons       : num  4.31 2.74 3.45 3.1 4.06 2.71 1.91 3.7 2.52 3.76 ...
+    ##  $ volume_cubic_yards: num  18 13 15 15 18 13 8 16 14 18 ...
+    ##  $ plastic_bottles   : num  1450 1120 2450 2380 980 1430 910 3580 2400 1340 ...
+    ##  $ polystyrene       : num  1820 1030 3100 2730 870 2140 1090 4310 2790 1730 ...
+    ##  $ cigarette_butts   : num  126000 91000 105000 100000 120000 90000 56000 112000 98000 130000 ...
+    ##  $ glass_bottles     : num  72 42 50 52 72 46 32 58 49 75 ...
+    ##  $ grocery_bags      : num  584 496 1080 896 368 ...
+    ##  $ chip_bags         : num  1162 874 2032 1971 753 ...
+    ##  $ sports_balls      : int  7 5 6 6 7 5 3 6 6 7 ...
+    ##  $ homes_powered     : num  0 0 0 0 0 0 0 0 0 0 ...
+
+so there are 344 observations and 14 variables in total. The key
+variables for trash data are dumpter number (dumpster), date of
+collection(year, month, date), amount of total litter (weight\_tons,
+volume\_cubic\_yards) and litter types (plastic\_bottles, polystyrene,
+cigarette\_butts, glass\_bottles, grocery\_bags, chip\_bags,
+sports\_balls, homes\_powered).
+
+In the precipitation data in 2017 and 2018, we can see the summary of
+variables from this
+    table:
+
+    ## Classes 'tbl_df', 'tbl' and 'data.frame':    19 obs. of  3 variables:
+    ##  $ month: chr  "January" "February" "March" "April" ...
+    ##  $ total: num  2.34 1.46 3.57 3.99 5.64 1.4 7.09 4.44 1.95 0 ...
+    ##  $ year : chr  "2017" "2017" "2017" "2017" ...
+
+so there are 19 observations and 3 variables in total. The key variables
+includes month, year and the total precipitation amounts.
+
+The total precipitation in 2018 was 23.5. The median number of sports
+balls in a dumpster in 2017 was 8.
 
 ## Problem 2
 
 ``` r
+#create a dataframe
 pols_month_df = read_csv("./data/pols-month.csv") %>%
   janitor::clean_names()  %>%
+  #seperate date into year, month and day
   separate(mon, c("year", "month", "day")) %>%
   mutate(year = as.integer(year),
          month = as.integer(month),
          day = as.integer(day),
+         #replace month number with month name
          month = as.factor(month.name[month]),
+         #create a president variable taking values gop and dem
          president = ifelse(prez_gop == "1", "gop", "dem")) %>%
+  #remove prez_dem and prez_gop, and the day variable
   select(-day, -prez_gop, -prez_dem)
 ```
 
@@ -77,25 +121,6 @@ pols_month_df = read_csv("./data/pols-month.csv") %>%
     ## )
 
 ``` r
-pols_month_df
-```
-
-    ## # A tibble: 822 x 9
-    ##     year month    gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem president
-    ##    <int> <fct>      <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr>    
-    ##  1  1947 January       23      51     253      23      45     198 dem      
-    ##  2  1947 February      23      51     253      23      45     198 dem      
-    ##  3  1947 March         23      51     253      23      45     198 dem      
-    ##  4  1947 April         23      51     253      23      45     198 dem      
-    ##  5  1947 May           23      51     253      23      45     198 dem      
-    ##  6  1947 June          23      51     253      23      45     198 dem      
-    ##  7  1947 July          23      51     253      23      45     198 dem      
-    ##  8  1947 August        23      51     253      23      45     198 dem      
-    ##  9  1947 Septemb~      23      51     253      23      45     198 dem      
-    ## 10  1947 October       23      51     253      23      45     198 dem      
-    ## # ... with 812 more rows
-
-``` r
 snp_df = read_csv("./data/snp.csv") %>%
   janitor::clean_names()  %>%
   separate(date, c("month", "day", "year")) %>%
@@ -103,8 +128,10 @@ snp_df = read_csv("./data/snp.csv") %>%
          month = as.integer(month),
          day = as.integer(day),
          month = month.name[month],
-         month = factor(month, levels = month.name)) %>%
+         #in order to order by month
+         month = factor(month, levels = month.name)) %>% 
   arrange(year, month) %>%
+  #organize so that year and month are the leading columns
   select(year, month, everything())
 ```
 
@@ -115,31 +142,13 @@ snp_df = read_csv("./data/snp.csv") %>%
     ## )
 
 ``` r
-snp_df
-```
-
-    ## # A tibble: 787 x 4
-    ##     year month       day close
-    ##    <int> <fct>     <int> <dbl>
-    ##  1  1950 January       3  17.0
-    ##  2  1950 February      1  17.2
-    ##  3  1950 March         1  17.3
-    ##  4  1950 April         3  18.0
-    ##  5  1950 May           1  18.8
-    ##  6  1950 June          1  17.7
-    ##  7  1950 July          3  17.8
-    ##  8  1950 August        1  18.4
-    ##  9  1950 September     1  19.5
-    ## 10  1950 October       2  19.5
-    ## # ... with 777 more rows
-
-``` r
-unemployment_df = read_csv("./data/unemployment.csv") %>%
+unemploy_df = read_csv("./data/unemployment.csv") %>%
   janitor::clean_names()  %>%
   pivot_longer(
     jan:dec,
     names_to = "month", 
     values_to = "unemployment") %>%
+  #change month into full name to keep the same key variable name and the same value
   mutate(month = factor(month, labels = month.name),
          year = as.integer(year))
 ```
@@ -160,25 +169,6 @@ unemployment_df = read_csv("./data/unemployment.csv") %>%
     ##   Nov = col_double(),
     ##   Dec = col_double()
     ## )
-
-``` r
-unemployment_df
-```
-
-    ## # A tibble: 816 x 3
-    ##     year month     unemployment
-    ##    <int> <fct>            <dbl>
-    ##  1  1948 May                3.4
-    ##  2  1948 April              3.8
-    ##  3  1948 August             4  
-    ##  4  1948 January            3.9
-    ##  5  1948 September          3.5
-    ##  6  1948 July               3.6
-    ##  7  1948 June               3.6
-    ##  8  1948 February           3.9
-    ##  9  1948 December           3.8
-    ## 10  1948 November           3.7
-    ## # ... with 806 more rows
 
 ``` r
 #merge snp into pols
@@ -209,7 +199,7 @@ snp_pols
 
 ``` r
 #merge unemployment into the result
-snp_pols_unemploy = left_join(snp_pols, unemployment_df, by = c("year", "month"))
+snp_pols_unemploy = left_join(snp_pols, unemploy_df, by = c("year", "month"))
 ```
 
     ## Warning: Column `month` joining character vector and factor, coercing into
@@ -235,15 +225,23 @@ snp_pols_unemploy
     ## # ... with 812 more rows, and 3 more variables: day <int>, close <dbl>,
     ## #   unemployment <dbl>
 
+Comment: Write a short paragraph about these datasets. Explain briefly
+what each dataset contained, and describe the resulting dataset
+(e.g. give the dimension, range of years, and names of key variables).
+
 ## Problem 3
 
 ``` r
+#create popular baby name dataframe
 pop_baby_name = read_csv("./data/Popular_Baby_Names.csv") %>%
   janitor::clean_names()  %>%
+  #uppercase child's first name to make data look better
   mutate(childs_first_name = toupper(childs_first_name),
+         # unify ethnicity name
          ethnicity = ifelse(ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER", ethnicity),
          ethnicity = ifelse(ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC", ethnicity),
          ethnicity = ifelse(ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC", ethnicity)) %>%
+  #delete duplicate rows
   distinct()
 ```
 
@@ -262,45 +260,49 @@ pop_baby_name = read_csv("./data/Popular_Baby_Names.csv") %>%
 filter(pop_baby_name, childs_first_name == "OLIVIA") %>%
   select(year_of_birth, ethnicity, rank) %>%
   pivot_wider(
-    names_from = "ethnicity",
+    names_from = "year_of_birth",
     values_from = "rank"
-  )
+  ) %>%
+  knitr::kable()
 ```
 
-    ## # A tibble: 6 x 5
-    ##   year_of_birth `ASIAN AND PACI~ `BLACK NON HISP~ HISPANIC `WHITE NON HISP~
-    ##           <dbl>            <dbl>            <dbl>    <dbl>            <dbl>
-    ## 1          2016                1                8       13                1
-    ## 2          2015                1                4       16                1
-    ## 3          2014                1                8       16                1
-    ## 4          2013                3                6       22                1
-    ## 5          2012                3                8       22                4
-    ## 6          2011                4               10       18                2
+| ethnicity                  | 2016 | 2015 | 2014 | 2013 | 2012 | 2011 |
+| :------------------------- | ---: | ---: | ---: | ---: | ---: | ---: |
+| ASIAN AND PACIFIC ISLANDER |    1 |    1 |    1 |    3 |    3 |    4 |
+| BLACK NON HISPANIC         |    8 |    4 |    8 |    6 |    8 |   10 |
+| HISPANIC                   |   13 |   16 |   16 |   22 |   22 |   18 |
+| WHITE NON HISPANIC         |    1 |    1 |    1 |    1 |    4 |    2 |
 
 ``` r
 # the most popular name among male children over time
 filter(pop_baby_name, rank == "1", gender == "MALE") %>%
   select(year_of_birth, ethnicity, childs_first_name ) %>%
   pivot_wider(
-    names_from = "ethnicity",
+    names_from = "year_of_birth",
     values_from = "childs_first_name"
-  )
+  ) %>%
+  knitr::kable()
 ```
 
-    ## # A tibble: 6 x 5
-    ##   year_of_birth `ASIAN AND PACI~ `BLACK NON HISP~ HISPANIC `WHITE NON HISP~
-    ##           <dbl> <chr>            <chr>            <chr>    <chr>           
-    ## 1          2016 ETHAN            NOAH             LIAM     JOSEPH          
-    ## 2          2015 JAYDEN           NOAH             LIAM     DAVID           
-    ## 3          2014 JAYDEN           ETHAN            LIAM     JOSEPH          
-    ## 4          2013 JAYDEN           ETHAN            JAYDEN   DAVID           
-    ## 5          2012 RYAN             JAYDEN           JAYDEN   JOSEPH          
-    ## 6          2011 ETHAN            JAYDEN           JAYDEN   MICHAEL
+| ethnicity                  | 2016   | 2015   | 2014   | 2013   | 2012   | 2011    |
+| :------------------------- | :----- | :----- | :----- | :----- | :----- | :------ |
+| ASIAN AND PACIFIC ISLANDER | ETHAN  | JAYDEN | JAYDEN | JAYDEN | RYAN   | ETHAN   |
+| BLACK NON HISPANIC         | NOAH   | NOAH   | ETHAN  | ETHAN  | JAYDEN | JAYDEN  |
+| HISPANIC                   | LIAM   | LIAM   | LIAM   | JAYDEN | JAYDEN | JAYDEN  |
+| WHITE NON HISPANIC         | JOSEPH | DAVID  | JOSEPH | DAVID  | JOSEPH | MICHAEL |
 
 ``` r
-male_whnohis = filter(pop_baby_name, gender == "MALE", ethnicity =="WHITE NON HISPANIC", year_of_birth == "2016")
-scatterplot = ggplot(male_whnohis, aes(y = count, x = rank)) +geom_point()
+# pull the data of male, white born in 2016
+male_whnohis_16 = filter(pop_baby_name, gender == "MALE", ethnicity =="WHITE NON HISPANIC", year_of_birth == "2016")
+# produce a scatter plot 
+scatterplot = ggplot(male_whnohis_16, aes(y = count, x = rank)) +geom_point() + labs(title = "Number of children with a name against the rank in popularity of that name", x ="rank", y = "number of children")
 scatterplot
 ```
 
-![](hw2_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](hw2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+ggsave("scatterplot.pdf")
+```
+
+    ## Saving 7 x 5 in image
