@@ -118,8 +118,18 @@ snp_pols_unemploy = left_join(snp_pols, unemploy_df, by = c("year", "month"))
 snp_pols_unemploy
 ```
 Comment:
-Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
-
+The data “pols-month” contains `r nrow(pols_month_df)` entries with `r ncol(pols_month_df)` columns ranging from 1947 to 2015, related to the number of national politicians who are democratic or republican at any given time. The data "snp" contains `r nrow(snp_df)` entries with `r ncol(snp_df)` columns ranging from 1950 to 2015, related to Standard & Poor’s stock market index. The data "unemployment" contains `r nrow(snp_df)` entries with `r ncol(snp_df)` columns ranging from 1950 to 2015, related to percentage of unemployment in the associated month of the associated year. After merging "snp" into "pols-month" data by month and year, superfluous data on July. 2015 in snp was deleted and the dimension became `r nrow(snp_pols)` entries(the same as "pols-month") with `r ncol(snp_pols)` columns(two new columns from "snp") ranging from 1947 to 2015. After merging "unemployment" into resulting dataframe, superfluous data on some months of 2015 in "unemployment" was deleted and the dimension became `r nrow(snp_pols_unemploy)` entries(still the same as "pols-month") with `r ncol(snp_pols_unemploy)` columns(one new column from "unemployment") ranging from 1947 to 2015. The key variables in this combining dataframe are shown below: 
+year, month: date of the count
+day: the date of the observation
+president: indicator of whether the president was republican or democratic on the associated date (gop = republican, dem = democratic)
+gov_gop: the number of republican governors on the associated date
+sen_gop: the number of republican senators on the associated date
+rep_gop: the number of republican representatives on the associated date
+gov_dem: the number of democratic governors on the associated date
+sen_dem: the number of democratic senators on the associated date
+rep_dem: the number of democratic representatives on the associated date
+close: the closing values of the S&P stock index on the associated date
+unemployment: percentage of unemployment in the associated month of the associated year
 
 ## Problem 3
 

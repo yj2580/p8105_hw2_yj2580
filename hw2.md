@@ -225,9 +225,34 @@ snp_pols_unemploy
     ## # ... with 812 more rows, and 3 more variables: day <int>, close <dbl>,
     ## #   unemployment <dbl>
 
-Comment: Write a short paragraph about these datasets. Explain briefly
-what each dataset contained, and describe the resulting dataset
-(e.g. give the dimension, range of years, and names of key variables).
+Comment: The data “pols-month” contains 822 entries with 9 columns
+ranging from 1947 to 2015, related to the number of national politicians
+who are democratic or republican at any given time. The data “snp”
+contains 787 entries with 4 columns ranging from 1950 to 2015, related
+to Standard & Poor’s stock market index. The data “unemployment”
+contains 787 entries with 4 columns ranging from 1950 to 2015, related
+to percentage of unemployment in the associated month of the associated
+year. After merging “snp” into “pols-month” data by month and year,
+superfluous data on July. 2015 in snp was deleted and the dimension
+became 822 entries(the same as “pols-month”) with 11 columns(two new
+columns from “snp”) ranging from 1947 to 2015. After merging
+“unemployment” into resulting dataframe, superfluous data on some
+months of 2015 in “unemployment” was deleted and the dimension became
+822 entries(still the same as “pols-month”) with 12 columns(one new
+column from “unemployment”) ranging from 1947 to 2015. The key variables
+in this combining dataframe are shown below: year, month: date of the
+count day: the date of the observation president: indicator of whether
+the president was republican or democratic on the associated date (gop =
+republican, dem = democratic) gov\_gop: the number of republican
+governors on the associated date sen\_gop: the number of republican
+senators on the associated date rep\_gop: the number of republican
+representatives on the associated date gov\_dem: the number of
+democratic governors on the associated date sen\_dem: the number of
+democratic senators on the associated date rep\_dem: the number of
+democratic representatives on the associated date close: the closing
+values of the S\&P stock index on the associated date unemployment:
+percentage of unemployment in the associated month of the associated
+year
 
 ## Problem 3
 
