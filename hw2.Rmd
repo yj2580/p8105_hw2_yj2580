@@ -15,33 +15,46 @@ library(dplyr)
 ## Problem 1
 
 ```{r}
-trash_df = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 1)%>%
+# Create a dataframe from the Mr. Trash Wheel sheet
+trash_df = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1)%>%
+#clean names, make variable names reasonable
   janitor::clean_names() %>%
-  select(-x15) %>%
+#omit non data entries
+  select(-x15, -x16, -x17) %>%
+#omit rows that do not include dumpster-specific data
   drop_na(dumpster)  %>%
+#round the number of sports balls and transfer them into integers
   mutate(sports_balls = as.integer(round(as.numeric(sports_balls))))
 
 
 ```
 
 ```{r}
+#Create a dataframe of precipitation data for 2018
 pre2018_df = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 3, range = "A2:B14") %>%
   janitor::clean_names() %>%
-  mutate(year = "2018")  %>%
+#add a variable year, convert month to a character variable
+  mutate(year = "2018",
+         month = month.name)  %>%
+#omit rows without precipitation data
   drop_na()
 
+#Create a dataframe of precipitation data for 2017
 pre2017_df = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 4, range = "A2:B14") %>%
   janitor::clean_names() %>%
-  mutate(year = "2017")  %>%
+#add a variable year,convert month to a character variable
+  mutate(year = "2017",
+         month = month.name)  %>%
+#omit rows without precipitation data
   drop_na()
 
-pre_df = left_join(pre2017_df, pre2018_df, by = "month") %>%
-  mutate(month = month.name)
-pre_df
+#combine precipitation datasets
+pre_df = rbind(pre2017_df, pre2018_df)
 
 ```
 
-The total precipitation in 2018 was `r sum(pre_df$total_y, na.rm = T)`. The median number of sports balls in a dumpster in 2017 was `r median(pull(filter(trash_df, year == "2017"), sports_balls))`.
+Comments: 
+The total precipitation in 2018 was `r sum(pull(filter(pre_df, year == "2018"),total))`. The median number of sports balls in a dumpster in 2017 was `r median(pull(filter(trash_df, year == "2017"), sports_balls))`.
 
 
 ## Problem 2

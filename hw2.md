@@ -6,50 +6,48 @@ yj2580
 ## Problem 1
 
 ``` r
-trash_df = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 1)%>%
+# Create a dataframe from the Mr. Trash Wheel sheet
+trash_df = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1)%>%
+#clean names, make variable names reasonable
   janitor::clean_names() %>%
-  select(-x15) %>%
+#omit non data entries
+  select(-x15, -x16, -x17) %>%
+#omit rows that do not include dumpster-specific data
   drop_na(dumpster)  %>%
+#round the number of sports balls and transfer them into integers
   mutate(sports_balls = as.integer(round(as.numeric(sports_balls))))
 ```
 
     ## New names:
     ## * `` -> ...15
+    ## * `` -> ...16
+    ## * `` -> ...17
 
 ``` r
+#Create a dataframe of precipitation data for 2018
 pre2018_df = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 3, range = "A2:B14") %>%
   janitor::clean_names() %>%
-  mutate(year = "2018")  %>%
+#add a variable year, convert month to a character variable
+  mutate(year = "2018",
+         month = month.name)  %>%
+#omit rows without precipitation data
   drop_na()
 
+#Create a dataframe of precipitation data for 2017
 pre2017_df = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = 4, range = "A2:B14") %>%
   janitor::clean_names() %>%
-  mutate(year = "2017")  %>%
+#add a variable year,convert month to a character variable
+  mutate(year = "2017",
+         month = month.name)  %>%
+#omit rows without precipitation data
   drop_na()
 
-pre_df = left_join(pre2017_df, pre2018_df, by = "month") %>%
-  mutate(month = month.name)
-pre_df
+#combine precipitation datasets
+pre_df = rbind(pre2017_df, pre2018_df)
 ```
 
-    ## # A tibble: 12 x 5
-    ##    month     total.x year.x total.y year.y
-    ##    <chr>       <dbl> <chr>    <dbl> <chr> 
-    ##  1 January      2.34 2017      0.96 2018  
-    ##  2 February     1.46 2017      5.3  2018  
-    ##  3 March        3.57 2017      2.18 2018  
-    ##  4 April        3.99 2017      3.2  2018  
-    ##  5 May          5.64 2017      9.27 2018  
-    ##  6 June         1.4  2017      0.2  2018  
-    ##  7 July         7.09 2017      2.39 2018  
-    ##  8 August       4.44 2017     NA    <NA>  
-    ##  9 September    1.95 2017     NA    <NA>  
-    ## 10 October      0    2017     NA    <NA>  
-    ## 11 November     0.11 2017     NA    <NA>  
-    ## 12 December     0.94 2017     NA    <NA>
-
-The total precipitation in 2018 was 0. The median number of sports balls
-in a dumpster in 2017 was 8.
+Comments: The total precipitation in 2018 was 23.5. The median number of
+sports balls in a dumpster in 2017 was 8.
 
 ## Problem 2
 
